@@ -3,6 +3,8 @@ package com.ie.fbrss.controller;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,11 @@ final class RootController {
 	@Inject
 	private RootController(final FbCollector facebookCollector) {
 		this.facebookCollector = facebookCollector;
+	}
+
+	@RequestMapping(value = "/favicon.ico", method = RequestMethod.GET)
+	public ResponseEntity<?> getFavicon(final HttpServletRequest request, final Model model) {
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = "**", method = RequestMethod.GET)

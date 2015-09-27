@@ -41,7 +41,7 @@ public final class FbCollector {
 		}
 
 		if (fbAppId != null && fbAppSecret != null) {
-			facebook = new FacebookTemplate(fbAppId + "|" + fbAppSecret);
+			facebook = connectToFacebook(fbAppId + "|" + fbAppSecret);
 		} else {
 			facebook = null;
 		}
@@ -49,18 +49,18 @@ public final class FbCollector {
 
 	public void collectData(final String fbUrl, final Model model) {
 
-		final FbPage fbPage = getId(facebook, fbUrl);
-
-		if (facebook == null || !fbAuthorized(facebook)) {
+		if (facebook == null) {
 			final RssContent data = new RssContent();
-			data.setTitle(fbPage.getName());
+			data.setTitle("Could not authorize to Facebook!");
 			data.setUrl(fbUrl);
-			data.setSummary("Could not authorize to facebook!");
+			data.setSummary("");
 			data.setCreatedDate(new Date());
 			model.addAttribute("feedContent", Arrays.asList(data));
 			model.addAttribute("feedMetadata", data);
 			return;
 		}
+
+		final FbPage fbPage = getId(fbUrl);
 
 		final RssContent feedMetadata = new RssContent();
 		feedMetadata.setTitle(fbPage.getName());
@@ -80,6 +80,19 @@ public final class FbCollector {
 
 		model.addAttribute("feedContent", feedContent);
 		model.addAttribute("feedMetadata", feedMetadata);
+	}
+
+	private Facebook connectToFacebook(final String token) {
+		try {
+			final Facebook facebook = new FacebookTemplate(token);
+			if (facebook.isAuthorized()) {
+				return facebook;
+			} else {
+				return null;
+			}
+		} catch (final Exception ex) {
+			return null;
+		}
 	}
 
 	private RssContent createCommentContent(final Comment comment) {
@@ -103,23 +116,11 @@ public final class FbCollector {
 		return content;
 	}
 
-	private boolean fbAuthorized(final Facebook facebook) {
-		try {
-			if (facebook.isAuthorized()) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (final Exception ex) {
-			return false;
-		}
+	private FbPage getId(final String fbUrl) {
+		return fbSiteCache.computeIfAbsent(fbUrl, this::retrieveFbPage);
 	}
 
-	private FbPage getId(final Facebook facebook, final String fbUrl) {
-		return fbSiteCache.computeIfAbsent(fbUrl, key -> retrieveFbPage(facebook, key));
-	}
-
-	private FbPage retrieveFbPage(final Facebook facebook, final String fbUrl) {
+	private FbPage retrieveFbPage(final String fbUrl) {
 		return facebook.restOperations().getForObject(FACEBOOK_GRAPH_URL + "{https}" + fbUrl, FbPage.class, "https://");
 	}
 }
