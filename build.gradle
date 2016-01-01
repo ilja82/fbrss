@@ -35,11 +35,14 @@ repositories {
     maven { url "http://repo.spring.io/release" }
 }
 
+ext {
+    romeVersion = '1.5.1'
+}
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-social-facebook")
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("com.rometools:rome:1.5.1")
+    compile("com.rometools:rome:${romeVersion}")
     testCompile("org.springframework.boot:spring-boot-starter-test") 
 }
 
