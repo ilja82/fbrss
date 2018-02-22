@@ -100,8 +100,9 @@ public final class FbCollector {
 
     private RssContent createCommentContent(final Comment comment) {
         final RssContent commentContent = new RssContent();
-        commentContent.setTitle("Comment from " + comment.getFrom()
-                .getName());
+        Reference from = comment.getFrom();
+        String name = from != null ? from.getName() : "NONAME";
+        commentContent.setTitle("Comment from " + name);
         commentContent.setUrl(FACEBOOK_URL + comment.getId());
         commentContent.setSummary(comment.getMessage());
         commentContent.setCreatedDate(comment.getCreatedTime());

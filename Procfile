@@ -1,1 +1,0 @@
-web: export JAVA_OPTS="${JAVA_OPTS} -Dserver.port=$PORT" && build/install/fbrss/bin/fbrss
