@@ -101,10 +101,10 @@ public final class FbCollector {
         content.setUrl(FACEBOOK_URL + post.getId());
         String comments = retrieveComments(post);
         String picture = post.getPicture();
-        final String summary = post.getMessage()
-                + (post.getDescription() != null ? "\nLink description: " + post.getDescription() : "")
-                + (picture != null ? createImageTag(picture) : "")
-                + "\n\n" + comments;
+        final String summary = (picture != null ? createImageTag(picture) : "")
+                + post.getMessage()
+                + (post.getDescription() != null ? "<br/>Link description: " + post.getDescription() : "")
+                + "<br/><br/>" + comments;
         content.setSummary(summary);
         content.setCreatedDate(post.getCreatedTime());
         return content;
