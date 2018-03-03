@@ -1,19 +1,20 @@
 package com.ie.fbrss.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.BeanNameViewResolver;
 
-import com.ie.fbrss.viewer.RssViewer;
-
-@Configuration
 @EnableWebMvc
-class WebConfig extends WebMvcConfigurerAdapter {
+@Configuration
+@ComponentScan
+class WebConfig {
 
-	@Override
-	public void configureViewResolvers(final ViewResolverRegistry registry) {
-		registry.enableContentNegotiation(new RssViewer());
-	}
+    @Bean
+    public ViewResolver beanNameViewResolver() {
+        return new BeanNameViewResolver();
+    }
 
 }

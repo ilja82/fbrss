@@ -1,18 +1,24 @@
 package com.ie.fbrss.fb;
 
-import com.ie.fbrss.data.FbPage;
-import com.ie.fbrss.data.RssContent;
-import org.springframework.social.facebook.api.*;
-import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+
+import org.springframework.social.facebook.api.Comment;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.PagedList;
+import org.springframework.social.facebook.api.PagingParameters;
+import org.springframework.social.facebook.api.Post;
+import org.springframework.social.facebook.api.Reference;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+
+import com.ie.fbrss.data.AtomContent;
+import com.ie.fbrss.data.FbPage;
 
 @Component
 public final class FbCollector {
@@ -48,7 +54,7 @@ public final class FbCollector {
     public void collectData(final String fbUrl, final Model model) {
 
         if (facebook == null) {
-            final RssContent data = new RssContent();
+            final AtomContent data = new AtomContent();
             data.setTitle("Could not authorize to Facebook!");
             data.setUrl(fbUrl);
             data.setSummary("");
@@ -60,7 +66,7 @@ public final class FbCollector {
 
         final FbPage fbPage = getId(fbUrl);
 
-        final RssContent feedMetadata = new RssContent();
+        final AtomContent feedMetadata = new AtomContent();
         feedMetadata.setTitle(fbPage.getName());
         feedMetadata.setUrl(fbUrl);
 
@@ -68,7 +74,7 @@ public final class FbCollector {
                 .getFeed(fbPage.getId(), PAGING_PARAMETERS);
 
         // Collect all posts:
-        List<RssContent> feedContent = posts.stream()
+        List<AtomContent> feedContent = posts.stream()
                 .map(this::createPostEntry)
                 .collect(Collectors.toList());
 
@@ -95,8 +101,8 @@ public final class FbCollector {
         return String.format("Comment from <b>%s</b><br />%s<br /><i>%s</i>", name, comment.getMessage(), comment.getCreatedTime());
     }
 
-    private RssContent createPostEntry(final Post post) {
-        final RssContent content = new RssContent();
+    private AtomContent createPostEntry(final Post post) {
+        final AtomContent content = new AtomContent();
         content.setTitle(post.getStory() != null ? post.getStory() : post.getMessage());
         content.setUrl(FACEBOOK_URL + post.getId());
         String comments = retrieveComments(post);

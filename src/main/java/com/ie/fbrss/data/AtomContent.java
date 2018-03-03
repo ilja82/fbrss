@@ -2,7 +2,7 @@ package com.ie.fbrss.data;
 
 import java.util.Date;
 
-public final class RssContent {
+public final class AtomContent {
 	private String title;
 	private String url;
 	private String summary;
