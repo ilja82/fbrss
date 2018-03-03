@@ -92,7 +92,7 @@ public final class FbCollector {
     private String createCommentContent(final Comment comment) {
         Reference from = comment.getFrom();
         String name = from != null ? from.getName() : "NONAME";
-        return String.format("Comment from %s%n%s%n%s", name, comment.getMessage(), comment.getCreatedTime());
+        return String.format("Comment from <b>%s</b>%n%s%n<i>%s</i>", name, comment.getMessage(), comment.getCreatedTime());
     }
 
     private RssContent createPostEntry(final Post post) {
