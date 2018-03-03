@@ -7,7 +7,6 @@ import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +21,7 @@ public final class FbCollector {
 
     private static final String FACEBOOK_URL = "https://www.facebook.com/";
 
-    private static final PagingParameters PAGING_PARAMETERS = new PagingParameters(5, 0, null, null);
+    private static final PagingParameters PAGING_PARAMETERS = new PagingParameters(10, 0, null, null);
 
     private final Facebook facebook;
 
@@ -73,14 +72,6 @@ public final class FbCollector {
                 .map(this::createPostEntry)
                 .collect(Collectors.toList());
 
-        // Also collect all comments of each post:
-        posts.stream()
-                .map(post -> facebook.commentOperations()
-                        .getComments(post.getId(), PAGING_PARAMETERS))
-                .flatMap(Collection::stream)
-                .map(this::createCommentContent)
-                .forEachOrdered(feedContent::add);
-
         model.addAttribute("feedContent", feedContent);
         model.addAttribute("feedMetadata", feedMetadata);
     }
@@ -98,27 +89,37 @@ public final class FbCollector {
         }
     }
 
-    private RssContent createCommentContent(final Comment comment) {
-        final RssContent commentContent = new RssContent();
+    private String createCommentContent(final Comment comment) {
         Reference from = comment.getFrom();
         String name = from != null ? from.getName() : "NONAME";
-        commentContent.setTitle("Comment from " + name);
-        commentContent.setUrl(FACEBOOK_URL + comment.getId());
-        commentContent.setSummary(comment.getMessage());
-        commentContent.setCreatedDate(comment.getCreatedTime());
-        return commentContent;
+        return String.format("Comment from %s%n%s%n%s", name, comment.getMessage(), comment.getCreatedTime());
     }
 
     private RssContent createPostEntry(final Post post) {
         final RssContent content = new RssContent();
         content.setTitle(post.getStory() != null ? post.getStory() : post.getMessage());
         content.setUrl(FACEBOOK_URL + post.getId());
+        String comments = retrieveComments(post);
+        String picture = post.getPicture();
         final String summary = post.getMessage()
                 + (post.getDescription() != null ? "\nLink description: " + post.getDescription() : "")
-                + (post.getPicture() != null ? "\nPicture: " + post.getPicture() : "");
+                + (picture != null ? createImageTag(picture) : "")
+                + "\n\n" + comments;
         content.setSummary(summary);
         content.setCreatedDate(post.getCreatedTime());
         return content;
+    }
+
+    private String createImageTag(String picture) {
+        return String.format("<img src=\"%s\" />", picture);
+    }
+
+    private String retrieveComments(Post post) {
+        return facebook.commentOperations()
+                    .getComments(post.getId(), PAGING_PARAMETERS)
+                    .stream()
+                    .map(this::createCommentContent)
+                    .collect(Collectors.joining("\n\n"));
     }
 
     private FbPage getId(final String fbUrl) {
