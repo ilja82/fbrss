@@ -92,7 +92,7 @@ public final class FbCollector {
     private String createCommentContent(final Comment comment) {
         Reference from = comment.getFrom();
         String name = from != null ? from.getName() : "NONAME";
-        return String.format("Comment from <b>%s</b>%n%s%n<i>%s</i>", name, comment.getMessage(), comment.getCreatedTime());
+        return String.format("Comment from <b>%s</b><br />%s<br /><i>%s</i>", name, comment.getMessage(), comment.getCreatedTime());
     }
 
     private RssContent createPostEntry(final Post post) {
@@ -119,7 +119,7 @@ public final class FbCollector {
                     .getComments(post.getId(), PAGING_PARAMETERS)
                     .stream()
                     .map(this::createCommentContent)
-                    .collect(Collectors.joining("\n\n"));
+                    .collect(Collectors.joining("<br /><br />"));
     }
 
     private FbPage getId(final String fbUrl) {
