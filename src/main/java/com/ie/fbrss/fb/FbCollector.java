@@ -1,24 +1,20 @@
 package com.ie.fbrss.fb;
 
+import com.ie.fbrss.data.AtomContent;
+import com.ie.fbrss.data.FbPage;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
-
-import org.springframework.social.facebook.api.Comment;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.facebook.api.PagingParameters;
 import org.springframework.social.facebook.api.Post;
-import org.springframework.social.facebook.api.Reference;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-
-import com.ie.fbrss.data.AtomContent;
-import com.ie.fbrss.data.FbPage;
 
 @Component
 public final class FbCollector {
@@ -84,9 +80,9 @@ public final class FbCollector {
 
     private Facebook connectToFacebook(final String token) {
         try {
-            final Facebook facebook = new FacebookTemplate(token);
-            if (facebook.isAuthorized()) {
-                return facebook;
+            final Facebook fb = new FacebookTemplate(token);
+            if (fb.isAuthorized()) {
+                return fb;
             } else {
                 return null;
             }
@@ -95,22 +91,12 @@ public final class FbCollector {
         }
     }
 
-    private String createCommentContent(final Comment comment) {
-        Reference from = comment.getFrom();
-        String name = from != null ? from.getName() : "NONAME";
-        return String.format("Comment from <b>%s</b><br />%s<br /><i>%s</i>", name, comment.getMessage(), comment.getCreatedTime());
-    }
-
     private AtomContent createPostEntry(final Post post) {
         final AtomContent content = new AtomContent();
         content.setTitle(post.getStory() != null ? post.getStory() : post.getMessage());
         content.setUrl(FACEBOOK_URL + post.getId());
-        String comments = retrieveComments(post);
-        String picture = post.getPicture();
-        final String summary = (picture != null ? createImageTag(picture) : "")
-                + post.getMessage()
-                + (post.getDescription() != null ? "<br/>Link description: " + post.getDescription() : "")
-                + "<br/><br/>" + comments;
+        String       picture = post.getPicture();
+        final String summary = (picture != null ? createImageTag(picture) : "") + post.getMessage() + (post.getDescription() != null ? "<br/>Link description: " + post.getDescription() : "");
         content.setSummary(summary);
         content.setCreatedDate(post.getCreatedTime());
         return content;
@@ -118,14 +104,6 @@ public final class FbCollector {
 
     private String createImageTag(String picture) {
         return String.format("<img src=\"%s\" />", picture);
-    }
-
-    private String retrieveComments(Post post) {
-        return facebook.commentOperations()
-                    .getComments(post.getId(), PAGING_PARAMETERS)
-                    .stream()
-                    .map(this::createCommentContent)
-                    .collect(Collectors.joining("<br /><br />"));
     }
 
     private FbPage getId(final String fbUrl) {

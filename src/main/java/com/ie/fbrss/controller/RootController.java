@@ -1,16 +1,14 @@
 package com.ie.fbrss.controller;
 
+import com.ie.fbrss.fb.FbCollector;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.HandlerMapping;
-
-import com.ie.fbrss.fb.FbCollector;
 
 @Controller
 final class RootController {
@@ -23,8 +21,8 @@ final class RootController {
     }
 
     @GetMapping(value = "/favicon.ico")
-    public ResponseEntity<?> getFavicon(final HttpServletRequest request, final Model model) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity getFavicon() {
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(value = "**")

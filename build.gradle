@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.0.RELEASE'
+        springBootVersion = '2.0.3.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -27,13 +27,13 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
 
     compile("org.springframework.social:spring-social-facebook:2.0.3.RELEASE")
-    compile("com.rometools:rome:1.9.0")
+    compile("com.rometools:rome:1.10.0")
 
     compile("org.springframework.boot:spring-boot-devtools")
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+wrapper {
+    gradleVersion = '4.8'
 }
